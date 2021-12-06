@@ -1,25 +1,30 @@
 #include "Philo.h"
 
 
-void init_philos(t_philo *philos, t_data *data)
+t_philo *init_philos(t_data *data)
 {
 	int	i;
+	t_philo *philos;
 
 	i = 0;
+	printf("%d\n", data->nb_philo);
+	philos = NULL;
 	philos = (t_philo *)malloc((data->nb_philo) * sizeof(t_philo));
 	while (i < data->nb_philo)
 	{
-		philos[i].id = i;
+		philos[i].id = i + 1;
 		philos[i].nb_meals = 0;
 		philos[i].is_eating = 0;
-		philos[i].last_time_eaten = time_now();
-		philos[i].begin = philos[0].last_time_eaten;
+		//philos[i].last_time_eaten = time_now();
+		//philos[i].begin = philos[0].last_time_eaten;
 		i++;
 	}
+	return (philos);
 }
-void init(t_data *data, t_philo *philos)
+t_philo *init(t_data *data)
 {
-	int	i;
+	int		i;
+	t_philo	*philos;
 
 	i = 0;
 	data->forks = malloc((data->nb_philo) * sizeof(pthread_mutex_t));
@@ -27,7 +32,24 @@ void init(t_data *data, t_philo *philos)
 		pthread_mutex_init(&data->forks[i], NULL);
 	pthread_mutex_init(&data->write, NULL);
 	pthread_mutex_init(&data->eating, NULL);
-	init_philos(philos, data);
+	philos = init_philos(data);
+	return (philos);
+}
+
+void	*routine(void *philo)
+{
+	t_philo *philo1;
+
+	philo1 = (t_philo *)philo;
+	if (philo1 == NULL) 
+		return (NULL);
+	/*while (1)
+	{
+		ft_eat(philo1);
+		ft_sleep(philo1);
+		ft_think(philo1);
+	}*/
+	printf("hello thread %d\n", philo1->id);
 }
 
 void dining(t_data *data)
@@ -35,7 +57,7 @@ void dining(t_data *data)
 	int 	i;
 	t_philo	*philos;
 
-	init(data, philos);
+	philos = init(data);
 	while (i < data->nb_philo)
 	{
 		if (pthread_create(&philos[i].tid, NULL, routine, philos + i))

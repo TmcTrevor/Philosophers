@@ -29,3 +29,8 @@ typedef struct  s_philo
 	unsigned long long	last_time_eaten;
 
 }	   t_philo;
+
+int		ft_atoi(const char *str);
+int		ft_strlen(char *str);
+
+#endif
