@@ -150,14 +150,12 @@ void	*routine(void *philo)
 	t_data *data;
 
 	data = (t_data *)philo;
-	if (data == NULL) 
+	if (data == NULL || data->nb_meals == 0) 
 	 	return (NULL);
 	int i = 0;
-	while (i < 30)
+	while (1)
 	{
-		//printf("sadasd\n");
 		ft_eat(data);
-		//printf("hello");
 		ft_sleep(data);
 		ft_think(data);
 		i++;
@@ -170,27 +168,35 @@ int		meals_eaten(t_data *data, int e)
 {
 	int i;
 
-	i = data->philos[e];
-	
+	i = data->philos[e].nb_meals;
+	if (i == data->nb_meals && data->philos[e].is_eating == 0)
+		return (0);
+	return (1);
 }
 
 void	break_point(t_data *data)
 {
 	int i;
+	int	k;
 
-	while (1)
+	k = 1;
+	while (k)
 	{
 		i = 0;
 		while (i < data->nb_philo)
 		{
 			pthread_mutex_lock(&data->eating);
-			if (meals_eaten(data, i))
+			if (!meals_eaten(data, i))
+			{	
+				k = 0;
 				break;
+			}
 			if (data->philos[i].is_eating  &&
 				time_passed(data->philos[i].last_time_eaten) > data->t_death)
 			{
 				printstat(data, -1);
 				break;
+				k = 0;
 			}
 			pthread_mutex_unlock(&data->eating);
 			i++;
